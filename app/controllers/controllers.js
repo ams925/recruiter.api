@@ -36,49 +36,48 @@ exports.Registration = async (req, res) => {
             error: "body not found",
             status: 400
         })
-    } else {
-        if (req.body.password.length < 6) {
-            res.status(403).json({
-                error: "we dont ask for your dicks size. please write a valid password.",
-                status: 403
-            })
-        }
-        const hashPass = await utils.HashPass(req.body.password)
-        validator.validate(req.body.email)
-        const isExist = DB.CheckUserExist(res, req.body.email)
-        const otp = utils.GenerateOTP(6)
-        const newUser = new us({
-            name: req.body.name,
-            gender: req.body.gender,
-            skill: req.body.skill,
-            email: req.body.email,
-            password: hashPass,
-            otp: otp,
-        })
-        const Save = newUser.save()
-        const user = DB.GetUserByEmail(res, req.body.email)
-        Save.then((doc) => {
-            if (doc) {
-                SendMail(doc.name, doc.email, "Activate your account", res, otp, doc._id)
-                res.status(200).json({
-                    data: {
-                        id: doc._id,
-                        name: doc.name,
-                        skills: doc.skill,
-                        gender: doc.gender,
-                        email: doc.email,
-                    },
-                    message: "please active your account",
-                })
-            }
-        }).catch((err) => {
-            utils.CheckError(err, "Active Account handler")
-            res.status(500).json({
-                error: err.message,
-                status: 500
-            })
+    }
+    if (req.body.password.length < 6) {
+        res.status(403).json({
+            error: "we dont ask for your dicks size. please write a valid password.",
+            status: 403
         })
     }
+    const hashPass = await utils.HashPass(req.body.password)
+    validator.validate(req.body.email)
+    const isExist = DB.CheckUserExist(res, req.body.email)
+    const otp = utils.GenerateOTP(6)
+    const newUser = new us({
+        name: req.body.name,
+        gender: req.body.gender,
+        skill: req.body.skill,
+        email: req.body.email,
+        password: hashPass,
+        otp: otp,
+    })
+    const Save = newUser.save()
+    const user = DB.GetUserByEmail(res, req.body.email)
+    Save.then((doc) => {
+        if (doc) {
+            SendMail(doc.name, doc.email, "Activate your account", res, otp, doc._id)
+            res.status(200).json({
+                data: {
+                    id: doc._id,
+                    name: doc.name,
+                    skills: doc.skill,
+                    gender: doc.gender,
+                    email: doc.email,
+                },
+                message: "please active your account",
+            })
+        }
+    }).catch((err) => {
+        utils.CheckError(err, "Active Account handler")
+        res.status(500).json({
+            error: err.message,
+            status: 500
+        })
+    })
 }
 
 exports.ActiveAccount = async (req, res) => {

@@ -15,8 +15,8 @@ exports.SendMail = (user, email, sub, res, otp, userid) => {
         to: email,
         subject: sub,
         html: `Hello ${user},<br/>
-               Your code is ${otp}.<br/>
-               <a href="http://localhost:4000/active-user/${userid}"></a>`
+               Your code is ${otp}<br/>
+               <a href="http://localhost:3000/active-user/${userid}">Click here</a> Activate your account.`
     }
 
     try {
